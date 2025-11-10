@@ -1,5 +1,6 @@
 
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
 
 // Icons
 const ConsultationIcon: React.FC<{className?: string}> = ({className}) => (
@@ -23,35 +24,66 @@ const SupportIcon: React.FC<{className?: string}> = ({className}) => (
     </svg>
 );
 
-const services = [
-  {
-    icon: ConsultationIcon,
-    title: 'Expert Consultation',
-    description: 'Benefit from personalized consultations with our team of experienced traders. Whether you\'re new to trading or a seasoned investor, our experts are here to provide tailored guidance and advice to help you achieve your financial goals.'
-  },
-  {
-    icon: TrainingIcon,
-    title: 'Advanced Training Resources',
-    description: 'Gain access to a wealth of educational materials and resources designed to enhance your trading skills. From comprehensive tutorials to in-depth market analysis, our training resources empower you to make informed decisions and navigate the markets with confidence.'
-  },
-  {
-    icon: SupportIcon,
-    title: '24/7 Customer Support',
-    description: 'Enjoy round-the-clock customer support from our dedicated team of professionals. Whether you have questions about our services, need technical assistance, or require help with your trading platform, our friendly support team is always available to assist you.'
-  }
-];
 
 const ServicesSection: React.FC = () => {
+    const sectionRef = useRef<HTMLElement>(null);
+    const [isVisible, setIsVisible] = useState(false);
+    const { t } = useLanguage();
+
+    const services = [
+      {
+        icon: ConsultationIcon,
+        title: t('services.services.consultation.title'),
+        description: t('services.services.consultation.description')
+      },
+      {
+        icon: TrainingIcon,
+        title: t('services.services.training.title'),
+        description: t('services.services.training.description')
+      },
+      {
+        icon: SupportIcon,
+        title: t('services.services.support.title'),
+        description: t('services.services.support.description')
+      }
+    ];
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    setIsVisible(true);
+                    observer.unobserve(entry.target);
+                }
+            },
+            { threshold: 0.1 }
+        );
+
+        if (sectionRef.current) {
+            observer.observe(sectionRef.current);
+        }
+
+        return () => {
+            if (sectionRef.current) {
+                observer.unobserve(sectionRef.current);
+            }
+        };
+    }, []);
+
   return (
-    <section id="services" className="py-20 bg-gray-900">
+    <section 
+        id="services" 
+        ref={sectionRef} 
+        className={`py-20 bg-gray-900 fade-in-section ${isVisible ? 'is-visible' : ''}`}
+    >
       <div className="container mx-auto px-6">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-white">Our Services</h2>
-          <p className="text-lg text-gray-400 mt-4 max-w-2xl mx-auto">We provide comprehensive support to ensure your success.</p>
+          <h2 className="text-3xl md:text-4xl font-bold text-white">{t('services.title')}</h2>
+          <p className="text-lg text-gray-400 mt-4 max-w-2xl mx-auto">{t('services.subtitle')}</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {services.map((service, index) => (
-            <div key={index} className="bg-gray-800 p-8 rounded-lg border border-yellow-400/20 shadow-lg transform hover:-translate-y-2 transition-transform duration-300 flex flex-col">
+            <div key={index} className="bg-gray-800 p-8 rounded-lg border border-yellow-400/20 shadow-lg transform hover:-translate-y-2 transition-all duration-300 flex flex-col hover:shadow-xl hover:shadow-yellow-400/10 hover:border-yellow-400/50">
               <div className="flex items-center justify-center h-16 w-16 rounded-full bg-yellow-400/10 mb-6 mx-auto">
                 <service.icon className="h-8 w-8 text-yellow-400" />
               </div>

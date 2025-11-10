@@ -1,5 +1,6 @@
 
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const RobotIcon: React.FC<{ className?: string }> = ({ className }) => (
     <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -9,28 +10,59 @@ const RobotIcon: React.FC<{ className?: string }> = ({ className }) => (
     </svg>
 );
 
-const series = [
-    {
-        name: "GPE V3",
-        description: "Basic version - auto entry, standard TP/SL"
-    },
-    {
-        name: "GPE V4",
-        description: "Most stable version - BE, trailing,Hold ON, swing,pending limit, mobile control, news filter"
-    },
-    {
-        name: "Titan Edition",
-        description: "For the elite community - full setup + guidance"
-    }
-];
 
 const RobotSeriesSection: React.FC = () => {
+    const sectionRef = useRef<HTMLElement>(null);
+    const [isVisible, setIsVisible] = useState(false);
+    const { t } = useLanguage();
+
+    const series = [
+        {
+            name: "GPE V3",
+            description: t('robotSeries.series.gpev3.description')
+        },
+        {
+            name: "GPE V4",
+            description: t('robotSeries.series.gpev4.description')
+        },
+        {
+            name: "Titan Edition",
+            description: t('robotSeries.series.titan.description')
+        }
+    ];
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    setIsVisible(true);
+                    observer.unobserve(entry.target);
+                }
+            },
+            { threshold: 0.1 }
+        );
+
+        if (sectionRef.current) {
+            observer.observe(sectionRef.current);
+        }
+
+        return () => {
+            if (sectionRef.current) {
+                observer.unobserve(sectionRef.current);
+            }
+        };
+    }, []);
+
     return (
-        <section id="robots" className="py-20 bg-black">
+        <section 
+            id="robots" 
+            ref={sectionRef} 
+            className={`py-20 bg-black fade-in-section ${isVisible ? 'is-visible' : ''}`}
+        >
             <div className="container mx-auto px-6">
                 <div className="text-center mb-12">
-                    <h2 className="text-3xl md:text-4xl font-bold text-white">Robot Series</h2>
-                    <p className="text-lg text-gray-400 mt-4 max-w-2xl mx-auto">Choose the version that best fits your trading strategy and goals.</p>
+                    <h2 className="text-3xl md:text-4xl font-bold text-white">{t('robotSeries.title')}</h2>
+                    <p className="text-lg text-gray-400 mt-4 max-w-2xl mx-auto">{t('robotSeries.subtitle')}</p>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {series.map((item, index) => (

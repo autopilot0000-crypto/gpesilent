@@ -1,23 +1,6 @@
 
-import React from 'react';
-
-const testimonials = [
-  {
-    quote: "Silent Profit has completely transformed my approach to investment. Their innovative solutions and expert team provided me with the tools I needed to succeed.",
-    name: 'Ahmad Kassim',
-    title: 'Business Owner'
-  },
-  {
-    quote: "The customer-centric approach at Silent Profit is second to none. They truly understand my needs and have delivered solutions that have exceeded my expectations.",
-    name: 'Siti Nurhaliza',
-    title: 'Marketing Manager'
-  },
-  {
-    quote: "Working with Silent Profit has been a game-changer for our company. Their dedication to excellence and integrity is evident in everything they do.",
-    name: 'Rajesh Kumar',
-    title: 'Startup Founder'
-  }
-];
+import React, { useState, useEffect, useRef } from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const StarIcon: React.FC<{ className?: string }> = ({ className }) => (
     <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 20 20" fill="currentColor">
@@ -26,12 +9,60 @@ const StarIcon: React.FC<{ className?: string }> = ({ className }) => (
 );
 
 const TestimonialsSection: React.FC = () => {
+    const sectionRef = useRef<HTMLElement>(null);
+    const [isVisible, setIsVisible] = useState(false);
+    const { t } = useLanguage();
+    
+    const testimonials = [
+      {
+        quote: t('testimonials.quotes.ahmad.quote'),
+        name: t('testimonials.quotes.ahmad.name'),
+        title: t('testimonials.quotes.ahmad.title')
+      },
+      {
+        quote: t('testimonials.quotes.siti.quote'),
+        name: t('testimonials.quotes.siti.name'),
+        title: t('testimonials.quotes.siti.title')
+      },
+      {
+        quote: t('testimonials.quotes.rajesh.quote'),
+        name: t('testimonials.quotes.rajesh.name'),
+        title: t('testimonials.quotes.rajesh.title')
+      }
+    ];
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    setIsVisible(true);
+                    observer.unobserve(entry.target);
+                }
+            },
+            { threshold: 0.1 }
+        );
+
+        if (sectionRef.current) {
+            observer.observe(sectionRef.current);
+        }
+
+        return () => {
+            if (sectionRef.current) {
+                observer.unobserve(sectionRef.current);
+            }
+        };
+    }, []);
+
   return (
-    <section id="testimonials" className="py-20 bg-black">
+    <section 
+        id="testimonials" 
+        ref={sectionRef} 
+        className={`py-20 bg-black fade-in-section ${isVisible ? 'is-visible' : ''}`}
+    >
       <div className="container mx-auto px-6">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-white">What Our Clients Say</h2>
-          <p className="text-lg text-gray-400 mt-4 max-w-2xl mx-auto">Our results speak for themselves. Here's what our clients have to say.</p>
+          <h2 className="text-3xl md:text-4xl font-bold text-white">{t('testimonials.title')}</h2>
+          <p className="text-lg text-gray-400 mt-4 max-w-2xl mx-auto">{t('testimonials.subtitle')}</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {testimonials.map((testimonial, index) => (

@@ -1,7 +1,9 @@
 
 import React from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const Logo: React.FC = () => {
+  const { t } = useLanguage();
   return (
     <div className="flex items-center space-x-3">
         <svg
@@ -37,7 +39,7 @@ const Logo: React.FC = () => {
         </svg>
         <div className="flex flex-col">
             <span className="font-bold text-xl tracking-wider text-white">SILENT PROFIT</span>
-            <span className="text-xs text-yellow-400 tracking-widest uppercase">Financial Freedom</span>
+            <span className="text-xs text-yellow-400 tracking-widest uppercase">{t('logo.tagline')}</span>
         </div>
     </div>
   );

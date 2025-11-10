@@ -1,5 +1,6 @@
 
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const LightbulbIcon: React.FC<{className?: string}> = ({className}) => (
     <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -19,31 +20,61 @@ const HeartIcon: React.FC<{className?: string}> = ({className}) => (
     </svg>
 );
 
-const features = [
-  {
-    icon: LightbulbIcon,
-    title: 'Innovative Solutions',
-    description: 'We stay at the forefront of technology to deliver innovative solutions that drive success and give you a competitive edge.'
-  },
-  {
-    icon: UsersIcon,
-    title: 'Expert Team',
-    description: 'Our team consists of experienced professionals passionate about technology and dedicated to achieving the best results for our clients.'
-  },
-  {
-    icon: HeartIcon,
-    title: 'Customer-Centric Approach',
-    description: 'Your success is our priority. We work closely with you to understand your needs and deliver tailored solutions that exceed expectations.'
-  }
-];
-
 const FeaturesSection: React.FC = () => {
+    const sectionRef = useRef<HTMLElement>(null);
+    const [isVisible, setIsVisible] = useState(false);
+    const { t } = useLanguage();
+
+    const features = [
+      {
+        icon: LightbulbIcon,
+        title: t('whyUs.features.innovative.title'),
+        description: t('whyUs.features.innovative.description')
+      },
+      {
+        icon: UsersIcon,
+        title: t('whyUs.features.expert.title'),
+        description: t('whyUs.features.expert.description')
+      },
+      {
+        icon: HeartIcon,
+        title: t('whyUs.features.customerCentric.title'),
+        description: t('whyUs.features.customerCentric.description')
+      }
+    ];
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    setIsVisible(true);
+                    observer.unobserve(entry.target);
+                }
+            },
+            { threshold: 0.1 }
+        );
+
+        if (sectionRef.current) {
+            observer.observe(sectionRef.current);
+        }
+
+        return () => {
+            if (sectionRef.current) {
+                observer.unobserve(sectionRef.current);
+            }
+        };
+    }, []);
+
   return (
-    <section id="why-us" className="py-20 bg-gray-900">
+    <section 
+        id="why-us" 
+        ref={sectionRef} 
+        className={`py-20 bg-gray-900 fade-in-section ${isVisible ? 'is-visible' : ''}`}
+    >
       <div className="container mx-auto px-6">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-white">Why Choose Us?</h2>
-          <p className="text-lg text-gray-400 mt-4 max-w-2xl mx-auto">We provide a seamless path to financial independence through technology and expertise.</p>
+          <h2 className="text-3xl md:text-4xl font-bold text-white">{t('whyUs.title')}</h2>
+          <p className="text-lg text-gray-400 mt-4 max-w-2xl mx-auto">{t('whyUs.subtitle')}</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {features.map((feature, index) => (
